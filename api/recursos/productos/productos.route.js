@@ -4,6 +4,7 @@ const _ = require("underscore")
 const uuidv4 = require('uuid/v4')
 const productos  = require('./../../../database').productos
 const {validarProducto} = require('./productos.validate')
+const log = require('../../../utils/logger')
 
 
 //rotuer de express
@@ -19,6 +20,7 @@ productosRouter.post('/',validarProducto,(req,res) => {
 
     nuevoProducto.id = uuidv4()
     productos.push(nuevoProducto)
+    log.info("Producto agregado a la coleccion productos", nuevoProducto)
     // Created 201 -- El request resulto la creacion de un nuevo recurso
     res.status(201).json(nuevoProducto)
 })
@@ -44,6 +46,7 @@ productosRouter.put('/:id', validarProducto, (req,res) =>{
         //remplazo
         remplazoParaProducto.id = id
         productos[elIndice] = remplazoParaProducto
+        log.info(`Producto con id [${id}] remplazo con nuevo producto`, remplazoParaProducto)
         res.status(200).json(remplazoParaProducto)
     } else {
         res.status(404).send(`El producto con id [${id}] no existe`)
@@ -54,6 +57,7 @@ productosRouter.delete('/:id',(req,res) => {
     let id = req.params.id
     let indiceABorrar = _.findIndex(productos, producto => producto.id == id)
     if (indiceABorrar === -1) {
+        log.warn(`El producto con id [${id}] no existe. No hay nada que borrar`)
         res.status(404).send(`El producto con id [${id}] no existe. No hay nada que borrar`)
         return
     }

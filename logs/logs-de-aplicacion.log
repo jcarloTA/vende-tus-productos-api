@@ -1,0 +1,64 @@
+[32minfo[39m: hola soy logger
+[33mwarn[39m: Soy un warn
+[31merror[39m: algo fallo
+[32minfo[39m: hola soy logger
+[33mwarn[39m: Soy un warn
+[31merror[39m: algo fallo
+[32minfo[39m: hola soy logger {"nombre":"jancarlo","edad":22}
+[33mwarn[39m: Soy un warn
+[31merror[39m: algo fallo
+[32minfo[39m: hola soy logger {"nombre":"jancarlo","edad":22}
+[33mwarn[39m: Soy un warn
+[31merror[39m: algo fallo
+[32minfo[39m: hola soy logger {"nombre":"jancarlo","edad":22}
+[33mwarn[39m: Soy un warn
+[31merror[39m: algo fallo
+[32minfo[39m: hola soy logger {"nombre":"jancarlo","edad":22}
+[33mwarn[39m: Soy un warn
+[31merror[39m: algo fallo
+[32minfo[39m: hola soy logger {"nombre":"jancarlo","edad":22}
+[33mwarn[39m: Soy un warn
+[31merror[39m: algo fallo
+[32minfo[39m: hola soy logger {"nombre":"jancarlo","edad":22}
+[33mwarn[39m: Soy un warn
+[31merror[39m: algo fallo
+[32minfo[39m: hola soy logger {"nombre":"jancarlo","edad":22}
+[33mwarn[39m: Soy un warn
+[31merror[39m: algo fallo
+[32minfo[39m: hola soy logger {"nombre":"jancarlo","edad":22}
+[33mwarn[39m: Soy un warn
+[31merror[39m: algo fallo
+[32minfo[39m: hola soy logger {"nombre":"jancarlo","edad":22}
+[33mwarn[39m: Soy un warn
+[31merror[39m: algo fallo
+[32minfo[39m: hola soy logger {"nombre":"jancarlo","edad":22}
+[33mwarn[39m: Soy un warn
+[31merror[39m: algo fallo
+[32minfo[39m: hola soy logger {"nombre":"jancarlo","edad":22}
+[33mwarn[39m: Soy un warn
+[31merror[39m: algo fallo
+[32minfo[39m: hola soy logger {"nombre":"jancarlo","edad":22}
+[33mwarn[39m: Soy un warn
+[31merror[39m: algo fallo
+[32minfo[39m: Escuchando en el puerto 3000
+[32minfo[39m: Escuchando en el puerto 3000
+[32minfo[39m: Escuchando en el puerto 3000
+[32minfo[39m: Escuchando en el puerto 3000
+[32minfo[39m: Escuchando en el puerto 3000
+[32minfo[39m: ::1 - GET /productos HTTP/1.1 200 198 - 7.054 ms
+[32minfo[39m: Escuchando en el puerto 3000
+[32minfo[39m: ::1 - GET /productos HTTP/1.1 200 198 - 6.285 ms
+[32minfo[39m: Escuchando en el puerto 3000
+[32minfo[39m: ::1 - POST /productos HTTP/1.1 400 138 - 124.164 ms
+[32minfo[39m: ::1 - POST /productos HTTP/1.1 201 95 - 3.208 ms
+[32minfo[39m: Escuchando en el puerto 3000
+[32minfo[39m: Escuchando en el puerto 3000
+[32minfo[39m: Producto agregado a la coleccion productos {"titulo":"Fornite","precio":400.23,"moneda":"USD","id":"83f2dbdd-4b6b-4141-b09d-365753711a0b"}
+[32minfo[39m: ::1 - POST /productos HTTP/1.1 201 95 - 18.439 ms
+[32minfo[39m: Producto con id [1] remplazo con nuevo producto {"titulo":"The witcher 3 Version completa","precio":800,"moneda":"USD","id":"1"}
+[32minfo[39m: ::1 - PUT /productos/1 HTTP/1.1 200 80 - 1.765 ms
+[32minfo[39m: ::1 - DELETE /productos/1 HTTP/1.1 200 82 - 0.761 ms
+[33mwarn[39m: El producto con id [23423] no existe. No hay nada que borrar
+[32minfo[39m: ::1 - DELETE /productos/23423 HTTP/1.1 404 60 - 1.009 ms
+[33mwarn[39m: El siguiente producto no paso la validacion:  {"titulo":"Fornite","precio":400.23,"moneda":"UD"}
+[32minfo[39m: ::1 - POST /productos HTTP/1.1 400 131 - 3.631 ms
