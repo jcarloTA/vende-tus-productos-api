@@ -5,6 +5,11 @@ const productos = [
     { id: '3',titulo:'Playerknowsbatlegrounds', precio: 700, moneda: 'USD'}
 ]
 
+const usuarios = [
+
+]
+
 module.exports = {
-    productos
+    productos,
+    usuarios
 }
