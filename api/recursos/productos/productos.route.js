@@ -6,12 +6,12 @@ const passport = require('passport')
 //id universal unico
 const uuidv4 = require('uuid/v4')
 
-//productos
-const productos  = require('./../../../database').productos
 //mideware 
-const {validarProducto} = require('./productos.validate')
+const {validarProducto, validarId} = require('./productos.validate')
 //log
 const log = require('../../../utils/logger')
+
+const productoController = require('./productos.controller');
 
 // passport jwt
 const jwtAuthenticate = passport.authenticate('jwt',{session:false});
@@ -20,70 +20,112 @@ const jwtAuthenticate = passport.authenticate('jwt',{session:false});
 const productosRouter = express.Router()
 
 productosRouter.get('/',(req, res) => {
-    res.json(productos)
+    productoController.obtenerProductos()
+    .then( productos => {
+        res.json(productos)
+    })
+    .catch( err => {
+        res.status(500).send("Error al leer los productos a la base de datos.")
+    })
 })
 //localhost:3000/productos
-productosRouter.post('/',[jwtAuthenticate, validarProducto],(req,res) => {
-    let nuevoProducto = {
-        ...req.body,
-        id:uuidv4(),
-        dueno: req.user.username
-    }
-    productos.push(nuevoProducto)
-    log.info("Producto agregado a la coleccion productos", nuevoProducto)
-    // Created 201 -- El request resulto la creacion de un nuevo recurso
-    res.status(201).json(nuevoProducto)
+productosRouter.post('/',[jwtAuthenticate, validarProducto],(req,res) => {    
+    productoController.crearProducto(req.body, req.user.username)
+    .then( producto => {
+        log.info("Producto agregado a la coleccion productos", producto)
+        res.status(201).json(producto)
+    })
+    .catch( err => {
+        log.error("Producto no pudo ser creado", err)
+        res.status(500).send("Error ocurrio al tratar de crear el producto")
+    })
 })
 
-productosRouter.get('/:id',(req,res) => {
-    for (let producto of productos) {
-        if (producto.id == req.params.id) {
+productosRouter.get('/:id',validarId,(req,res) => {
+    let id = req.params.id;
+    productoController.obtenerProducto(id)
+    .then( (producto) => {
+        if (!producto) {
+             res.status(404).send(`Producto con id [${id}] no existe.`)
+        } else {
             res.json(producto)
-            return
         }
-    }
+    })
+    .catch( (err) => {
+        log.error(`Excepcion ocurrio al tratar de obtener un producto con id [${id}]`,err);
+        res.status(500).send(`Error ocurrio obteniendo producto con id [${id}]`)
+    })
     //No found status 404
-    res.status(404).send(`El producto con id [${req.params.id}] no existe`)
 })
 // Con put no hay modificaciones parciales, se modifica completamente el recurso con uno nuevo.
-productosRouter.put('/:id', [ jwtAuthenticate, validarProducto], (req,res) => {
-    let remplazoParaProducto = {
-        ... req.body,
-        id: req.params.id,
-        dueno: req.user.username
+productosRouter.put('/:id', [ jwtAuthenticate, validarProducto], async (req,res) => {
+    let id = req.params.id
+    let requestUsuario = req.user.username
+    let productoARemplazar
+
+    try {
+        productoARemplazar = await productoController.obtenerProducto(id)
+    } catch (err) {
+        log.warn(`Excepcion ocurrio al procesar la modificacion del producto con id [${id}]`, err)
+        res.status(500).send(`Error ocurrion modificando producto con id [${id}]`)
+        return
     }
-    let elIndice = _.findIndex(productos, producto => producto.id == remplazoParaProducto.id)
-    
-    if (elIndice !== -1) {
-        if (productos[elIndice].dueno  !== remplazoParaProducto.dueno) {
-            log.info(`Usuario ${req.user.username} no es dueno de producto con id ${remplazoParaProducto.id}, Dueno real es ${productos[elIndice].dueno}. Request no sera procesado`)
-            res.status(401).send(`No eres dueno del producto con id ${remplazoParaProducto.id}. Solo puedes modificar productos creados por ti`);
-            return
-        }
-        productos[elIndice] = remplazoParaProducto
-        log.info(`Producto con id [${remplazoParaProducto.id}] remplazo con nuevo producto`, remplazoParaProducto) 
-        res.status(200).json(remplazoParaProducto)
-    } else {
+
+    if (!productoARemplazar) {
         res.status(404).send(`El producto con id [${id}] no existe`)
     }
+    
+    if(productoARemplazar.dueno !== requestUsuario) {
+        log.warn(`Usuario [${requestUsuario}] no es dueno del producto con id [${id}]. Dueno real es [${productoARemplazar.dueno}]. Request no sera procesado`)
+        res.status(401).send(`No eres dueno del producto con id [${id}]. Solo puedes modificar productos creados por ti`)
+        return;
+    }
+
+    let elIndice = _.findIndex(productos, producto => producto.id == remplazoParaProducto.id)
+    
+    productoController.remplazoParaProducto(id, req.body, requestUsuario)
+    .then( producto => {
+        res.json(producto);
+        log.info(`Producto con id [${id}] reemplazado con nuevo producto`, producto)
+    })
+    .catch( (err) => {
+        log.error(`Excepcion al tratar de remplazar producto con id [${id}]`, err);
+        res.status(500).send(`Error ocurrio remplazando producto con id [${id}]`)
+    })
 })
 
-productosRouter.delete('/:id', jwtAuthenticate, (req,res) => { 
-    let indiceABorrar = _.findIndex(productos, producto => producto.id == req.params.id)
-    if (indiceABorrar === -1) {
-        log.warn(`El producto con id [${req.params.id}] no existe. No hay nada que borrar`)
-        res.status(404).send(`El producto con id [${req.params.id}] no existe. No hay nada que borrar`)
+productosRouter.delete('/:id', [ jwtAuthenticate, validarId], async (req,res) => { 
+    let id = req.params.id
+    let productoABorrar
+
+    try {
+        productoABorrar = await productoController.obtenerProducto(id)
+
+    } catch (err) {
+        log.error(`Exepcion ocurrio al procesar el borrado de producto con id [${id}]`, err)
+        res.status(500).send(`Error ocurrio borrando producto con id [${id}]`)
+        return
+    }    
+    if (!productoABorrar) {
+        log.info(`El producto con id [${id}] no existe. No hay nada que borrar`)
+        res.status(404).send(`El producto con id [${id}] no existe. No hay nada que borrar`)
         return
     }
 
-    if (productos[indiceABorrar].dueno  !== req.user.username) {
-        log.info(`Usuario ${req.user.username} no es dueno de producto con id ${productos[indiceABorrar].id}, Dueno real es ${productos[indiceABorrar].dueno}. Request no sera procesado`)
-        res.status(401).send(`No eres dueno del producto con id ${productos[indiceABorrar].id}. Solo puedes borrar productos creados por ti`);
+    let usuarioAutenticado = req.user.username 
+    if (productoABorrar.dueno !== usuarioAutenticado) {
+        log.info(`Usuario ${usuarioAutenticado} no es dueno de producto con id [${id}], Dueno real es [${productoABorrar.dueno}]. Request no sera procesado`)
+        res.status(401).send(`No eres dueno del producto con id [${id}]. Solo puedes borrar productos creados por ti`);
         return
     }
 
-    let borrado = productos.splice(indiceABorrar, 1)
-    res.json(borrado);
+    try {
+        let productoBorrado = await productoController.borrarProducto(id)
+        log.info(`Producto con id [${id}] fue borrado`)
+        res.json(productoBorrado)
+    } catch (err) {
+        res.status(500).send(`Error ocurrio borrando producton con id [${id}]`)
+    }
 })
 
 module.exports = productosRouter;

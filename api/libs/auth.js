@@ -1,11 +1,9 @@
-const _ = require('underscore')
 const log = require('./../../utils/logger')
-const usuarios = require('./../../database').usuarios
 const bcrypt = require('bcrypt')
 
 const passportJWT = require('passport-jwt')
 const config = require('../../config')
-
+const usuarioController = require('../recursos/usuarios/usuarios.controller')
 //Token debe ser espificado mediante el header "Authorizacion" . Ejemplo
 // Authorization: bearer xxxx.yyyy.xxxx
 
@@ -15,18 +13,24 @@ let jwtOptions = {
 }
 
 module.exports = new passportJWT.Strategy(jwtOptions, (jwtPayload, next) => {
-    let index = _.findIndex(usuarios, usuario => usuario.id === jwtPayload.id);
 
-    if (index === -1) {
-        log.info(`JWT token no es valido. Usuario con id ${jwtPayload.id} no existe.`)
-        next(null,false)
-        return
-    } else {
-        log.info(`Usuario ${usuarios[index].username} suministro un token valido. Autenticacion completada.`)
+    usuarioController.obtenerUsuario({id: jwtPayload.id }).then( usuario => {
+        if(!usuario) {
+            log.info(`JWT token no es valido. Usuario con id ${jwtPayload.id} no existe.`)
+            next(null, false)
+            return
+        }
+        log.info(`Usuario ${usuario.username} suministro un token valido. Autenticacion completada.`)
         next(null, {
-            username: usuarios[index].username,
-            id: usuarios[index].id  
+            username: usuario.username,
+            id: usuario.id
         })
-    }
+
+    })
+    .catch( err => {
+        console.log('usuario no valido')
+        log.error("Error ocurrio al tratar de validar un token", err)
+        next(err)
+    })
 
 })

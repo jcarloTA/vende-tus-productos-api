@@ -6,6 +6,7 @@ const config = require('./config')
 //libs npm
 const bodyParcer = require('body-parser')
 const morgan = require('morgan')
+const mongoose = require('mongoose')
 
 //libs
 const authJwt = require('./api/libs/auth')
@@ -16,11 +17,17 @@ const usuariosRoute = require('./api/recursos/usuarios/usuarios.routes')
 
 //Estrategia de autencicacion: 
 const passport = require('passport')
-const BasicStrategy = require('passport-http').BasicStrategy;
+const BasicStrategy = require('passport-http').BasicStrategy
+
+// MongoDB -> NoSql -> no existen las tablas, sino colecciones de documentos
+mongoose.connect('mongodb://127.0.0.1:27017/vendetusjuegos')
+mongoose.connection.on('error', () => {
+    logger.error('Fallo la conexion a mongodb')
+    process.exit(1)
+})
 
 passport.use(authJwt)
 const app = express()
-
 app.use(bodyParcer.json())
 app.use(morgan('short', {
     stream: {

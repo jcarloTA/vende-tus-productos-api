@@ -23,6 +23,18 @@ const validarProducto = (req, res, next) => {
     }
 }
 
+const validarId = (req, res, next) => {
+    let id = req.params.id
+
+    //regex o regular expresion: expreciones regulares
+    if (id.match(/^[a-fA-F0-9]{24}$/) === null) {
+        res.status(400).send(`El id [${id}] suminstrado en el URL no es valido`)
+        return 
+    } 
+    next()
+}
+
 module.exports = {
-    validarProducto
+    validarProducto,
+    validarId
 }
