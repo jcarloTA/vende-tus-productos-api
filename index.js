@@ -2,7 +2,7 @@ const express = require('express')
 const logger = require('./utils/logger')
 
 const config = require('./config')
-
+const errorHandler = require('./api/libs/errorHandler')
 //libs npm
 const bodyParcer = require('body-parser')
 const morgan = require('morgan')
@@ -39,6 +39,13 @@ app.use(passport.initialize())
 
 app.use('/productos',productosRoute)
 app.use('/usuarios', usuariosRoute)
+
+app.use(errorHandler.processarDeBD)
+if(config.ambiente === 'prod') {
+    app.use(errorHandler.erroresEnProduction)
+} else {
+    app.use(errorHandler.eroresEnDesarrollo)
+}
 
 app.get('/', passport.authenticate('jwt',{session:false}), (req,res) => {
     logger.info(JSON.stringify(req.user))

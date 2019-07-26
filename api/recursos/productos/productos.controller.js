@@ -3,7 +3,6 @@ const Producto = require('./productos.model');
 
 
 function crearProducto(producto, dueno) {
-
     return new Producto({
         ...producto,
         dueno
