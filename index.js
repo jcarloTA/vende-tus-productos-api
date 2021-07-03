@@ -52,6 +52,10 @@ app.get('/', passport.authenticate('jwt',{session:false}), (req,res) => {
     res.send('Api de vende tus juegos')
 })
 
-app.listen(config.puerto, () => {
+const server = app.listen(config.puerto, () => {
     logger.info('Escuchando en el puerto 3000')
-})
+});
+
+module.exports = {
+    app, server
+}

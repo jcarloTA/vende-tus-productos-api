@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "test": "jest --forceExit"
   },
   "author": "Jancarlo Ticun",
   "license": "ISC",
@@ -24,6 +25,8 @@
     "winston": "^3.1.0"
   },
   "devDependencies": {
-    "nodemon": "^1.19.1"
+    "jest": "^27.0.6",
+    "nodemon": "^1.19.1",
+    "supertest": "^6.1.3"
   }
 }
