@@ -5,7 +5,7 @@ const log = require('../../../utils/logger')
 const blueprintProducto = Joi.object().keys({
     titulo: Joi.string().max(100).required(),
     precio: Joi.number().positive().precision(2).required(),
-    moneda: Joi.string().length(3).uppercase()
+    moneda: Joi.string().length(3).uppercase().required()
 })
 
 //moddeware -- funcion intermedia que va hacer algo antes del proceso

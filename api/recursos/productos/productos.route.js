@@ -58,7 +58,7 @@ productosRouter.put('/:id', [ jwtAuthenticate, validarProducto], procesarErrores
         throw new UsuarioNoEsDueno(`No eres dueno del producto con id [${id}]. Solo puedes modificar productos creados por ti`)
     }
     
-    productoController.remplazoParaProducto(id, req.body, requestUsuario)
+    productoController.reemplazarProducto(id, req.body, requestUsuario)
     .then( producto => {
         res.json(producto);
         log.info(`Producto con id [${id}] reemplazado con nuevo producto`, producto)

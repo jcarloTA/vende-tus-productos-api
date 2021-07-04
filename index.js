@@ -24,7 +24,9 @@ mongoose.connect('mongodb://127.0.0.1:27017/vendetusjuegos')
 mongoose.connection.on('error', () => {
     logger.error('Fallo la conexion a mongodb')
     process.exit(1)
-})
+});
+
+mongoose.set('useFindAndModify',false)
 
 passport.use(authJwt)
 const app = express()

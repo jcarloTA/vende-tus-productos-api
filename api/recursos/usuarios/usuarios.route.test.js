@@ -6,6 +6,7 @@ let Usuario = require("./usuarios.model");
 let app = require("../../../index").app;
 let server = require("../../../index").server;
 let config = require("../../../config");
+let mongoose = require('mongoose');
 
 let dummyUsuarios = [
 	{
@@ -57,13 +58,14 @@ function usuarioExisteYatributosSonCorrectos(usuario, done) {
 
 describe("Usuarios", () => {
 	beforeEach((done) => {
-		Usuario.remove({}, (err) => {
+		Usuario.deleteMany({}, (err) => {
 			done();
 		});
 	});
 
-	afterAll(() => {
+	afterAll(async () => {
 		server.close();
+		await mongoose.disconnect();
 	});
 
 	describe("GET /usuarios", () => {
